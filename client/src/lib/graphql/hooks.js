@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getJob, getJobs } from "./queries";
+import { getCompany, getJob, getJobs } from "./queries";
 
 export function useJobs() {
   const [state, setState] = useState({ jobs: null, loading: true, error: false });
@@ -29,6 +29,23 @@ export function useJob(id) {
       })();
     } catch {
       setState({ job: null, loading: false, error: true });
+    }
+  }, [id]);
+
+  return state;
+}
+
+export function useCompany(id) {
+  const [state, setState] = useState({ company: null, loading: true, error: false });
+
+  useEffect(() => {
+    try {
+      (async () => {
+        const job = await getCompany(id);
+        setState({ company: job, loading: false, error: false });
+      })();
+    } catch {
+      setState({ company: null, loading: false, error: true });
     }
   }, [id]);
 

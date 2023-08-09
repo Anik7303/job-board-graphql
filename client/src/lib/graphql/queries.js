@@ -49,3 +49,26 @@ export async function getJob(id) {
   });
   return data?.job;
 }
+
+export async function getCompany(id) {
+  const companyByIdQuery = gql`
+    query CompanyById($id: ID!) {
+      company(id: $id) {
+        id
+        name
+        description
+        jobs {
+          id
+          title
+          date
+        }
+      }
+    }
+  `;
+
+  const { data } = await client.query({
+    query: companyByIdQuery,
+    variables: { id },
+  });
+  return data?.company;
+}
