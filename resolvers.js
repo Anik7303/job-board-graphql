@@ -5,8 +5,16 @@ import { toIsoDate } from "./lib/utils.js";
 
 export const resolvers = {
   Query: {
-    company: (_, { id }) => getCompany(id),
-    job: (_, { id }) => getJob(id),
+    company: async (_, { id }) => {
+      const company = await getCompany(id);
+      if (!company) throw notFoundError(`No company with an id of '${id}' found.`);
+      return company;
+    },
+    job: async (_, { id }) => {
+      const job = await getJob(id);
+      if (!job) throw notFoundError(`No job with an id of '${id}' found.`);
+      return job;
+    },
     jobs: () => getJobs(),
   },
 
@@ -15,13 +23,17 @@ export const resolvers = {
       if (!user) throw unauthorizedError("You are not authorized to create jobs.");
       return createJob({ companyId: user.companyId, title, description });
     },
-    updateJob: (_, { input: { id, title, description } }, { user }) => {
+    updateJob: async (_, { input: { id, title, description } }, { user }) => {
       if (!user) throw unauthorizedError("You are not authorized to update jobs.");
-      return updateJob({ id, title, description });
+      const job = await updateJob({ id, title, description, companyId: user.companyId });
+      if (!job) throw notFoundError(`No job with an id of '${id}' found.`);
+      return job;
     },
-    deleteJob: (_, { id }, { user }) => {
+    deleteJob: async (_, { id }, { user }) => {
       if (!user) throw unauthorizedError("You are not authorized to delete jobs.");
-      return deleteJob(id);
+      const job = await deleteJob(id, user.companyId);
+      if (!job) throw notFoundError(`No job with an id of '${id}' found.`);
+      return job;
     },
   },
 
@@ -35,4 +47,5 @@ export const resolvers = {
   },
 };
 
+const notFoundError = (message) => new GraphQLError(message, { extensions: { code: "NOT_FOUND" } });
 const unauthorizedError = (message) => new GraphQLError(message, { extensions: { code: "UNAUTHORIZED" } });
