@@ -1,12 +1,16 @@
-import { GraphQLClient } from "graphql-request";
+import { ApolloClient, InMemoryCache, createHttpLink, gql } from "@apollo/client";
 
 // backend server url for graphql
 const url = "http://localhost:9000/graphql";
+const httpLink = createHttpLink({ uri: url });
 
-const client = new GraphQLClient(url);
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: httpLink,
+});
 
 export async function getJobs() {
-  const query = `#graphql
+  const jobsQuery = gql`
     query Jobs {
       jobs {
         id
@@ -19,6 +23,7 @@ export async function getJobs() {
       }
     }
   `;
-  const { jobs } = await client.request(query);
-  return jobs;
+
+  const { data } = await client.query({ query: jobsQuery });
+  return data?.jobs;
 }
