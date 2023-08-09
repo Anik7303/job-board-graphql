@@ -1,70 +1,30 @@
-import { useEffect, useState } from "react";
-import { createJob, getCompany, getJob, getJobs } from "./queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { companyByIdQuery, createJobMutation, jobByIdQuery, jobsQuery } from "./queries";
 
 export function useJobs() {
-  const [state, setState] = useState({ jobs: null, loading: true, error: false });
-
-  useEffect(() => {
-    try {
-      (async () => {
-        const jobs = await getJobs();
-        setState({ jobs, loading: false, error: false });
-      })();
-    } catch {
-      setState({ jobs: null, loading: false, error: true });
-    }
-  }, []);
-
-  return state;
+  const { data, loading, error } = useQuery(jobsQuery, { fetchPolicy: "network-only" });
+  return { jobs: data?.jobs, loading, error };
 }
 
 export function useJob(id) {
-  const [state, setState] = useState({ job: null, loading: true, error: false });
-
-  useEffect(() => {
-    try {
-      (async () => {
-        const job = await getJob(id);
-        setState({ job, loading: false, error: false });
-      })();
-    } catch {
-      setState({ job: null, loading: false, error: true });
-    }
-  }, [id]);
-
-  return state;
+  const { data, loading, error } = useQuery(jobByIdQuery, { variables: { id } });
+  return { job: data?.job, loading, error };
 }
 
 export function useCompany(id) {
-  const [state, setState] = useState({ company: null, loading: true, error: false });
-
-  useEffect(() => {
-    try {
-      (async () => {
-        const company = await getCompany(id);
-        setState({ company, loading: false, error: false });
-      })();
-    } catch {
-      setState({ company: null, loading: false, error: true });
-    }
-  }, [id]);
-
-  return state;
+  const { data, loading, error } = useQuery(companyByIdQuery, { variables: { id }, fetchPolicy: "cache-and-network" });
+  return { company: data?.company, loading, error };
 }
 
 export function useCreateJob() {
-  const [state, setState] = useState({ job: null, loading: false, error: false });
+  const [mutate, { loading, error }] = useMutation(createJobMutation);
 
-  const mutate = async ({ title, description }) => {
-    try {
-      setState({ job: null, loading: true, error: false });
-      const job = await createJob({ title, description });
-      setState({ job, loading: false, error: false });
-      return job;
-    } catch {
-      setState({ job: null, loading: false, error: true });
-    }
+  const createJob = async ({ title, description }) => {
+    const { data } = await mutate({
+      variables: { input: { title, description } },
+    });
+    return data?.job;
   };
 
-  return { createJob: mutate, loading: state.loading, error: state.error };
+  return { createJob, loading, error };
 }
