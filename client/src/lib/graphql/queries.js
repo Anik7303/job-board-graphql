@@ -83,3 +83,25 @@ export async function getCompany(id) {
   });
   return data?.company;
 }
+
+export async function createJob({ title, description }) {
+  const createJobMutation = gql`
+    mutation CreateJob($input: CreateJobInput!) {
+      job: createJob(input: $input) {
+        id
+        title
+        description
+        date
+        company {
+          id
+          name
+        }
+      }
+    }
+  `;
+  const { data } = await client.mutate({
+    mutation: createJobMutation,
+    variables: { input: { title, description } },
+  });
+  return data?.job;
+}
