@@ -1,7 +1,7 @@
 type Query {
   company(id: ID!): Company
   job(id: ID!): Job
-  jobs(limit: Int, offset: Int): [Job!]
+  jobs(limit: Int, offset: Int): JobList
 }
 
 type Mutation {
@@ -19,6 +19,11 @@ type Job {
   """
   date: String!
   company: Company!
+}
+
+type JobList {
+  items: [Job!]
+  total: Int
 }
 
 type Company {
