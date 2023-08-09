@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCompany, getJob, getJobs } from "./queries";
+import { createJob, getCompany, getJob, getJobs } from "./queries";
 
 export function useJobs() {
   const [state, setState] = useState({ jobs: null, loading: true, error: false });
@@ -50,4 +50,21 @@ export function useCompany(id) {
   }, [id]);
 
   return state;
+}
+
+export function useCreateJob() {
+  const [state, setState] = useState({ job: null, loading: false, error: false });
+
+  const mutate = async ({ title, description }) => {
+    try {
+      setState({ job: null, loading: true, error: false });
+      const job = await createJob({ title, description });
+      setState({ job, loading: false, error: false });
+      return job;
+    } catch {
+      setState({ job: null, loading: false, error: true });
+    }
+  };
+
+  return { createJob: mutate, loading: state.loading, error: state.error };
 }
