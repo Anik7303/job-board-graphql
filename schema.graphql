@@ -10,4 +10,11 @@ type Job {
   The date when the job was published, in ISO-8601 format. e.g. 2022-12-31
   """
   date: String!
+  company: Company!
+}
+
+type Company {
+  id: ID!
+  name: String!
+  description: String
 }
