@@ -5,6 +5,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { authMiddleware, handleLogin } from "./auth.js";
+import { createCompanyLoader } from "./db/companies.js";
 import { getUser } from "./db/users.js";
 import { resolvers } from "./resolvers.js";
 
@@ -16,7 +17,9 @@ app.use(cors(), express.json(), authMiddleware);
 app.post("/login", handleLogin);
 
 async function getContext({ req }) {
-  const context = {};
+  const context = {
+    companyLoader: createCompanyLoader(),
+  };
   if (req.auth) {
     const user = await getUser(req.auth.sub);
     if (user) context.user = user;
