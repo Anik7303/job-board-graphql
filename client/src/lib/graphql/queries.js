@@ -1,12 +1,23 @@
-import { ApolloClient, InMemoryCache, createHttpLink, gql } from "@apollo/client";
+import { ApolloClient, ApolloLink, InMemoryCache, concat, createHttpLink, gql } from "@apollo/client";
+import { getAccessToken } from "../auth";
 
 // backend server url for graphql
 const url = "http://localhost:9000/graphql";
 const httpLink = createHttpLink({ uri: url });
+const authLink = new ApolloLink((operation, forward) => {
+  const token = getAccessToken();
+  if (token)
+    operation.setContext({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  return forward(operation);
+});
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: httpLink,
+  link: concat(authLink, httpLink),
 });
 
 export async function getJobs() {
