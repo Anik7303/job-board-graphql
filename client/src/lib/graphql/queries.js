@@ -45,6 +45,7 @@ export const jobsQuery = gql`
           name
         }
       }
+      total
     }
   }
 `;
