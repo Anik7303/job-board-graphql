@@ -41,8 +41,8 @@ export function useCompany(id) {
   useEffect(() => {
     try {
       (async () => {
-        const job = await getCompany(id);
-        setState({ company: job, loading: false, error: false });
+        const company = await getCompany(id);
+        setState({ company, loading: false, error: false });
       })();
     } catch {
       setState({ company: null, loading: false, error: true });
