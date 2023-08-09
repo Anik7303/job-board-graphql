@@ -34,14 +34,16 @@ const jobDetailFragment = gql`
 `;
 
 export const jobsQuery = gql`
-  query Jobs {
-    jobs {
-      id
-      title
-      date
-      company {
+  query Jobs($limit: Int, $offset: Int) {
+    jobs(limit: $limit, offset: $offset) {
+      items {
         id
-        name
+        title
+        date
+        company {
+          id
+          name
+        }
       }
     }
   }
