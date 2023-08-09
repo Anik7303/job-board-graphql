@@ -1,3 +1,13 @@
 type Query {
-  greeting: String
+  jobs: [Job!]
+}
+
+type Job {
+  id: ID!
+  title: String!
+  description: String
+  """
+  The date when the job was published, in ISO-8601 format. e.g. 2022-12-31
+  """
+  date: String!
 }

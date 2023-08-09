@@ -1,5 +1,12 @@
+import { getJobs } from "./db/jobs.js";
+import { toIsoDate } from "./lib/utils.js";
+
 export const resolvers = {
   Query: {
-    greeting: () => "hello",
+    jobs: () => getJobs(),
+  },
+
+  Job: {
+    date: (job) => toIsoDate(job.createdAt),
   },
 };
