@@ -5,6 +5,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { authMiddleware, handleLogin } from "./auth.js";
+import { getUser } from "./db/users.js";
 import { resolvers } from "./resolvers.js";
 
 const PORT = process.env.PORT || 9000;
@@ -14,8 +15,12 @@ app.use(cors(), express.json(), authMiddleware);
 
 app.post("/login", handleLogin);
 
-async function getContext() {
+async function getContext({ req }) {
   const context = {};
+  if (req.auth) {
+    const user = await getUser(req.auth.sub);
+    if (user) context.user = user;
+  }
   return context;
 }
 
