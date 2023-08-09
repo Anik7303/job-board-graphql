@@ -35,7 +35,7 @@ export async function getJobs() {
     }
   `;
 
-  const { data } = await client.query({ query: jobsQuery });
+  const { data } = await client.query({ query: jobsQuery, fetchPolicy: "network-only" });
   return data?.jobs;
 }
 
